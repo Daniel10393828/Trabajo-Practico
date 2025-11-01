@@ -1,88 +1,169 @@
-#include "estudiantes.h"
 #include <stdio.h>
-#include <stdlib.h>
-#define INICIAL_CAPACIDAD 10
+#include <string.h>
+#include "estudiantes.h"
+#include "materias.h"
 
-static void asegurarCapacidad(Estudiantes *lista)
+// Función para agregar un nuevo estudiante
+void agregarEstudiante(Estudiante estudiantes[], int *totalEstudiantes)
 {
-    if (lista->cantidadGuardados < lista->capacidad)
-        return;
+    Estudiante nuevoEstudiante;
 
-    int nuevaCapacidad = (lista->capacidad == 0) ? INICIAL_CAPACIDAD : lista->capacidad * 2;
-    Estudiante *nuevoEstudiante = (Estudiante *)realloc(lista->data, nuevaCapacidad * sizeof(Estudiante));
-    if (nuevoEstudiante == NULL)
+    printf("Ingrese el ID del estudiante: ");
+    scanf("%d", &nuevoEstudiante.id);
+
+    // Verificar si el ID es único
+    if (!esIdUnico(estudiantes, *totalEstudiantes, nuevoEstudiante.id))
     {
-        fprintf(stderr, "Error sin Memoria al redimensionar la lista\n");
-        exit(1);
+        printf("El ID ya existe. Intente con otro ID.\n");
+        return;
     }
 
-    lista->data = nuevoEstudiante;
-    lista->capacidad = nuevaCapacidad;
+    printf("Ingrese el nombre del estudiante: ");
+    getchar(); // Para consumir el salto de línea residual
+    fgets(nuevoEstudiante.nombre, sizeof(nuevoEstudiante.nombre), stdin);
+    nuevoEstudiante.nombre[strcspn(nuevoEstudiante.nombre, "\n")] = 0; // Eliminar salto de línea
+
+    printf("Ingrese la edad del estudiante: ");
+    scanf("%d", &nuevoEstudiante.edad);
+
+    nuevoEstudiante.cantidadMaterias = 0; // Inicialmente no está inscrito en ninguna materia
+    nuevoEstudiante.promedio = 0.0;       // Inicialmente no tiene promedio
+
+    // Agregar al array de estudiantes
+    estudiantes[*totalEstudiantes] = nuevoEstudiante;
+    (*totalEstudiantes)++;
+    printf("Estudiante agregado con éxito.\n");
 }
 
-// Funcion para inicializar Estudiantes
-
-void inicializarListaDeEstudiantes(Estudiantes *lista)
+// Función para listar todos los estudiantes
+void listarEstudiantes(Estudiante estudiantes[], int totalEstudiantes)
 {
-    lista->data = NULL;
-    lista->cantidadGuardados = 0;
-    lista->capacidad = 0;
-    lista->next_id = 1;
-}
-
-// Funcion para Liberar la Lista
-
-void vaciarEstudiantes(Estudiantes *lista)
-{
-    free(lista->data);
-    lista->data = NULL;
-    lista->cantidadGuardados = 0;
-    lista->capacidad = 0;
-}
-
-// Funcion para dar de alta un Estudiante
-
-int altaEstudiante(Estudiantes *lista, const char *nombre, int edad)
-{
-    asegurarCapacidad(lista);
-
-    Estudiante nuevoEstudiante;
-    nuevoEstudiante.id = lista->next_id++;
-    snprintf(nuevoEstudiante.nombre, NOMBRE_MAX, "%s", nombre);
-
-    nuevoEstudiante.nombre[NOMBRE_MAX - 1] = '\0'; // Asegurar terminacion nula
-    nuevoEstudiante.edad = edad;
-
-    lista->data[lista->cantidadGuardados++] = nuevoEstudiante;
-    return nuevoEstudiante.id;
-}
-
-// Funcion para Buscar la posicion de un Estudiante dentro del arreglo por ID
-
-int buscarEstudiantePorID(const Estudiantes *lista, int id)
-{
-    for (int i = 0; i < lista->cantidadGuardados; i++)
+    if (totalEstudiantes == 0)
     {
-        if (lista->data[i].id == id)
+        printf("No hay estudiantes registrados.\n");
+        return;
+    }
+
+    printf("\nLista de Estudiantes:\n");
+    for (int i = 0; i < totalEstudiantes; i++)
+    {
+        printf("ID: %d | Nombre: %s | Edad: %d | Promedio: %.2f\n", estudiantes[i].id, estudiantes[i].nombre, estudiantes[i].edad, estudiantes[i].promedio);
+    }
+}
+
+// Función para modificar los datos de un estudiante
+void modificarEstudiante(Estudiante estudiantes[], int totalEstudiantes)
+{
+    int id;
+    printf("Ingrese el ID del estudiante a modificar: ");
+    scanf("%d", &id);
+
+    Estudiante *estudiante = buscarEstudiantePorNombre(estudiantes, totalEstudiantes, id);
+    if (estudiante != NULL)
+    {
+        printf("Modificar nombre del estudiante (actual: %s): ", estudiante->nombre);
+        getchar(); // Para consumir el salto de línea residual
+        fgets(estudiante->nombre, sizeof(estudiante->nombre), stdin);
+        estudiante->nombre[strcspn(estudiante->nombre, "\n")] = 0;
+
+        printf("Modificar edad del estudiante (actual: %d): ", estudiante->edad);
+        scanf("%d", &estudiante->edad);
+        printf("Estudiante modificado con éxito.\n");
+    }
+    else
+    {
+        printf("Estudiante no encontrado.\n");
+    }
+}
+
+// Función para eliminar un estudiante
+void eliminarEstudiante(Estudiante estudiantes[], int *totalEstudiantes, int id)
+{
+    int found = 0;
+    for (int i = 0; i < *totalEstudiantes; i++)
+    {
+        if (estudiantes[i].id == id)
         {
-            return i;
+            found = 1;
+            for (int j = i; j < *totalEstudiantes - 1; j++)
+            {
+                estudiantes[j] = estudiantes[j + 1];
+            }
+            (*totalEstudiantes)--;
+            printf("Estudiante eliminado con éxito.\n");
+            break;
         }
     }
-    return -1; // No encontrado
+    if (!found)
+    {
+        printf("Estudiante con ID %d no encontrado.\n", id);
+    }
 }
 
-// Funcion para dar de Baja a un Estudiante por ID
-
-bool bajaEstudiante(Estudiantes *lista, int id)
+// Función para buscar un estudiante por nombre
+Estudiante *buscarEstudiantePorNombre(Estudiante estudiantes[], int totalEstudiantes, const char *nombre)
 {
-    int indiceEstudiante = buscarEstudiantePorID(lista, id);
-    if (indiceEstudiante == -1)
+    for (int i = 0; i < totalEstudiantes; i++)
     {
-        return false; // No encontrado
+        if (strcmp(estudiantes[i].nombre, nombre) == 0)
+        {
+            return &estudiantes[i];
+        }
+    }
+    return NULL;
+}
+
+// Función para buscar un estudiante por rango de edad
+Estudiante *buscarEstudiantePorEdad(Estudiante estudiantes[], int totalEstudiantes, int minEdad, int maxEdad)
+{
+    for (int i = 0; i < totalEstudiantes; i++)
+    {
+        if (estudiantes[i].edad >= minEdad && estudiantes[i].edad <= maxEdad)
+        {
+            return &estudiantes[i];
+        }
+    }
+    return NULL;
+}
+
+// Función para inscribir a un estudiante en una materia
+void inscribirMateria(Estudiante estudiantes[], int totalEstudiantes, const char *materia)
+{
+    int id;
+    printf("Ingrese el ID del estudiante a inscribir en la materia '%s': ", materia);
+    scanf("%d", &id);
+
+    Estudiante *estudiante = buscarEstudiantePorNombre(estudiantes, totalEstudiantes, id);
+    if (estudiante != NULL)
+    {
+        if (estudiante->cantidadMaterias < 100)
+        {
+            strcpy(estudiante->materiaInscrita[estudiante->cantidadMaterias], materia);
+            estudiante->cantidadMaterias++;
+            printf("Estudiante inscrito en la materia '%s' con éxito.\n", materia);
+        }
+        else
+        {
+            printf("El estudiante ya está inscrito en el máximo de materias.\n");
+        }
+    }
+    else
+    {
+        printf("Estudiante no encontrado.\n");
+    }
+}
+
+// Función para calcular el promedio del estudiante
+void calcularPromedio(Estudiante *estudiante)
+{
+    if (estudiante->cantidadMaterias == 0)
+    {
+        printf("El estudiante no tiene materias inscritas.\n");
+        return;
     }
 
-    // Mover el ultimo estudiante a la posicion del eliminado
-    lista->data[indiceEstudiante] = lista->data[lista->cantidadGuardados - 1];
-    lista->cantidadGuardados--;
-    return true;
+    // Aquí se calcula el promedio basado en las calificaciones de las materias (puedes agregar una variable por calificación)
+    // Como no tenemos calificaciones aún, dejaremos el promedio en 0 (puedes agregar una lógica adicional de calificación si lo deseas).
+    estudiante->promedio = 0.0; // Esto lo podrías actualizar con una fórmula real
+    printf("Promedio calculado: %.2f\n", estudiante->promedio);
 }
