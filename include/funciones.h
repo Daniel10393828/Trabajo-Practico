@@ -14,8 +14,7 @@ void ordenarEstudiantesPorNombre(Estudiante estudiantes[], int totalEstudiantes)
 void ordenarMateriasPorNombre(Materia materias[], int totalMaterias);
 
 // Función para cargar datos de estudiantes desde un archivo CSV (persistencia)
-void cargarEstudiantesDesdeCSV(Estudiante estudiantes[], int *totalEstudiantes, const char *archivo);
-
+void cargarEstudiantesDesdeCSV(Estudiante estudiantes[], int *totalEstudiantes, const char *archivo)
 // Función para guardar estudiantes en un archivo CSV
 void guardarEstudiantesEnCSV(Estudiante estudiantes[], int totalEstudiantes, const char *archivo);
 
