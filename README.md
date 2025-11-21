@@ -1,4 +1,4 @@
-Consigna del TP final:
+Consigna del TP final :
 
 
 Desarrollar un sistema de estudiantes en C. Debe permitir:
@@ -14,7 +14,6 @@ ABM: Alta Baja Modificación
 -Buscar estudiantes por nombre
 
 -Buscar estudiantes por rango de edad
-
 
 Además cada estudiante puede anotarse en N materias.
 
