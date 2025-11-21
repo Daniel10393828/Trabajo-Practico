@@ -3,17 +3,15 @@ Consigna del TP final :
 
 Desarrollar un sistema de estudiantes en C. Debe permitir:
 
-
 CRUD: Create Read Update Delete List
 
 ABM: Alta Baja Modificación
 
+-Dar de alta, modificar, eliminar y listar estudiantes.
 
--Dar de alta, modificar, eliminar y listar estudiantes
+-Buscar estudiantes por nombre.
 
--Buscar estudiantes por nombre
-
--Buscar estudiantes por rango de edad
+-Buscar estudiantes por rango de edad.
 
 Además cada estudiante puede anotarse en N materias.
 
@@ -23,12 +21,8 @@ Además cada estudiante puede anotarse en N materias.
 
 -Rendir una materia
 
-
 El sistema debe poder soportar un gran listado de estudiantes y materias. Utilizar estructuras de datos para almacenar los listados. Decidir si se utiliza ordenamiento de los datos.
-
-
 El diseño del sistema y los modelos son libres. Utilizar la creatividad para que el manejo del sistema sea lo más práctico posible.
-
 
 La única limitación respecto al uso de librerías es que la estructura de datos que usen sea de desarrollo propio.
 
@@ -62,5 +56,4 @@ mejoras en la interfaz de usuario
 tests unitarios
 
 Persistencia en CSV
-
 (cualquier otra feature que quieran agregar)
